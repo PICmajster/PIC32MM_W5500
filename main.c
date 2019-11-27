@@ -30,6 +30,7 @@
 #include "mcc_generated_files/spi3.h"
 #include "mcc_generated_files/pin_manager.h"
 #include <stdio.h>
+#include <string.h>
 #include "delay.h"
 #include "wizchip_conf.h"
 #include "w5500.h"
@@ -76,7 +77,7 @@ int main(void)
     printf("------------W5500_TEST_START---- --------\r\n");
     W5500_Init();
     printf("---------W5500 successfully connect to Router ---------\r\n"); // must be connect cable W5500 to Router
-       
+        
     while (1)
     {
                  
@@ -244,6 +245,10 @@ void UDP_Server(void)
                 {
                     return;
                 }
+                UART1_WriteBuffer(gDATABUF, size); //show the contents of the buffer 
+                memset(gDATABUF, 0, sizeof(gDATABUF)); //clear gDATABUF
+                printf("\r\n");
+                
                 // Send echo to remote
                 size = (uint16_t) ret;
                 sentsize = 0;

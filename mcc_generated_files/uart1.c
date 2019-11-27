@@ -95,6 +95,19 @@ void UART1_Write(uint8_t txData)
     U1TXREG = txData;    // Write the data byte to the USART.
 }
 
+unsigned int UART1_WriteBuffer( const uint8_t *buffer , const unsigned int bufLen )
+{
+    unsigned int numBytesWritten = 0 ;
+
+    while ( numBytesWritten < ( bufLen ))
+    {
+      UART1_Write (buffer[numBytesWritten++] ) ;
+    }
+
+    return numBytesWritten ;
+}
+
+
 bool UART1_IsRxReady(void)
 {
     return U1STAbits.URXDA;

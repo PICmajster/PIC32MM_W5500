@@ -62,27 +62,41 @@
   Section: UART1 APIs
 */
 
+
 /**
   @Summary
-    Initialization routine that takes inputs from the UART1 GUI.
+    Returns the number of bytes written into the internal buffer
 
   @Description
-    This routine initializes the UART1 driver.
-    This routine must be called before any other UART1 routine is called.
+    This API transfers the data from application buffer to internal buffer and 
+    returns the number of bytes added in that queue
 
   @Preconditions
-    None
-
-  @Param
-    None
-
-  @Returns
-    None
+    UART1_Initialize function should have been called 
+    before calling this function
 
   @Example
-    None.
-    
+    <code>
+    uint8_t myBuffer[MY_BUFFER_SIZE];
+    unsigned int numBytes = 0;
+    UART1_TRANSFER_STATUS status;
+
+    // Pre-initialize myBuffer with MY_BUFFER_SIZE bytes of valid data.
+
+    while (numBytes < MY_BUFFER_SIZE);
+    {
+        status = UART1_TransferStatusGet();
+        if (status & UART1_TRANSFER_STATUS_TX_EMPTY) {
+            numBytes += UART1_WriteBuffer(myBuffer + numBytes, MY_BUFFER_SIZE - numBytes);
+
+        }
+        // Do something else...
+    }
+    </code>
 */
+
+unsigned int UART1_WriteBuffer( const uint8_t *buffer , const unsigned int numbytes );
+
 
 void UART1_Initialize(void);
 
