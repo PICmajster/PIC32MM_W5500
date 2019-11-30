@@ -1,9 +1,2 @@
-build/default/production/MQTTUnsubscribeServer.o:  \
-MQTTUnsubscribeServer.c  \
- MQTTPacket.h  \
-MQTTConnect.h  \
-MQTTPublish.h  \
-MQTTSubscribe.h  \
- MQTTUnsubscribe.h  \
-MQTTFormat.h  \
-StackTrace.h 
+build/default/production/MQTTUnsubscribeServer.tmp:  \
+ build/default/production/MQTTUnsubscribeServer.i 

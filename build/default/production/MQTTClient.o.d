@@ -1,11 +1,2 @@
-build/default/production/MQTTClient.o:  \
-MQTTClient.c  \
-MQTTClient.h  \
- MQTTPacket.h  \
-MQTTConnect.h  \
-MQTTPublish.h  \
-MQTTSubscribe.h  \
- MQTTUnsubscribe.h  \
-MQTTFormat.h  \
-StackTrace.h  \
-mqtt_interface.h 
+build/default/production/MQTTClient.tmp:  \
+ build/default/production/MQTTClient.i 

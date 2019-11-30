@@ -43,16 +43,19 @@
 #define SOCK_ID_UDP       1
 #define PORT_TCP          5000
 #define PORT_UDP          10001
-#define DATA_BUF_SIZE     1024
+#define DATA_BUF_SIZE     2048
 
 wiz_NetInfo pnetinfo;
-uint8_t gDATABUF[DATA_BUF_SIZE];
+uint8_t gDATABUF[DATA_BUF_SIZE]; //shared buffer declaration
 uint8_t tmp;
 
+/*Call back function for W5500 SPI - Theses used as parametr of reg_wizchip_spi_cbfunc()
+ Should be implemented by WIZCHIP users because host is dependent it*/
 uint8_t CB_SpiRead(void);
 void CB_ChipSelect(void);
 void CB_ChipDeselect(void);
 void CB_SpiWrite(uint8_t wb);
+
 void TCP_Server(void);
 void UDP_Server(void);
 void W5500_Init(void);
@@ -87,34 +90,31 @@ int main(void)
         UDP_Server();
     }
 }
+/*Call back function for W5500 SPI*/
 
-// brief Call back function for WIZCHIP select.
-void CB_ChipSelect(void)
+void CB_ChipSelect(void) // Call back function for WIZCHIP select.
 {
     CS_SetLow();
 }
 
-// brief Call back function for WIZCHIP deselect.
-void CB_ChipDeselect(void)
+void CB_ChipDeselect(void) // Call back function for WIZCHIP deselect.
 {
     CS_SetHigh();
 }
 
-// brief Callback function to read byte usig SPI.
-uint8_t CB_SpiRead(void)
+uint8_t CB_SpiRead(void) // Callback function to read byte usig SPI.
 {
     return SPI3_Exchange8bit(0xFF);
 }
 
-// brief Callback function to write byte usig SPI.
-void CB_SpiWrite(uint8_t wb)
+void CB_SpiWrite(uint8_t wb) // Callback function to write byte usig SPI.
 {
     SPI3_Exchange8bit(wb);
     
 }
 
 
-// brief Handle TCP socket state.
+/* Handle TCP socket state.*/
 void TCP_Server(void)
 {
     int32_t ret;
@@ -214,7 +214,7 @@ void TCP_Server(void)
     }
 }
 
-// brief Handle UDP socket state.
+/* Handle UDP socket state.*/
 void UDP_Server(void)
 {
     int32_t  ret;
@@ -288,7 +288,7 @@ void UDP_Server(void)
     }
 }
 
-// brief Initialize modules
+/* Initialize modules */
  void W5500_Init(void)
 {
     // Set Tx and Rx buffer size to 2KB
@@ -303,8 +303,8 @@ void UDP_Server(void)
     Wizchip_Reset = 1;
     delayMs(1);
 
-     /* Chip selection call back */
-     //_WIZCHIP_IO_MODE_ == _WIZCHIP_IO_MODE_SPI_VDM_
+     /* Registration call back */
+     //_WIZCHIP_IO_MODE_ = _WIZCHIP_IO_MODE_SPI_VDM_
     reg_wizchip_cs_cbfunc(CB_ChipSelect, CB_ChipDeselect);
 
     /* SPI Read & Write callback function */
@@ -320,6 +320,7 @@ void UDP_Server(void)
           printf("Unknown PHY Link status.\r\n");
        delayMs(500);
     }  while(tmp == PHY_LINK_OFF); 
+    printf("PHY Link status OK.\r\n");
     
     /*Intialize the network information to be used in WIZCHIP*/
     network_init();
@@ -333,6 +334,7 @@ void network_init(void)
   // Display Network Information 
   ctlnetwork(CN_GET_NETINFO, (void*)&pnetinfo);    // Read registers value , W5500 Network Settings    
   ctlwizchip(CW_GET_ID,(void*)tmpstr); //GET ID WIZNET like this : W5500
+  /*Send the data to the Uart*/
   printf("\r\n=== %s NET CONF ===\r\n",(char*)tmpstr);
   printf("MAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n", pnetinfo.mac[0],pnetinfo.mac[1],pnetinfo.mac[2],
 		   pnetinfo.mac[3],pnetinfo.mac[4],pnetinfo.mac[5]);

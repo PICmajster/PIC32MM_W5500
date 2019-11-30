@@ -1,3 +1,2 @@
-build/default/production/delay.o:  \
-delay.c  \
-delay.h 
+build/default/production/delay.tmp:  \
+build/default/production/delay.i 
