@@ -87,7 +87,6 @@ int main(void)
 //open_socket();    
     while (1)
     {
-                 
         /*TCP Server*/
         TCP_Server();
         /*UDP Server*/
@@ -248,9 +247,9 @@ void UDP_Server(void)
                 {
                     size = DATA_BUF_SIZE;
                 }
-
                 // Get received data
                 ret = recvfrom(SOCK_ID_UDP, gDATABUF, size, destip, (uint16_t*)&destport);
+                printf("\r\nIP client : %d.%d.%d.%d\r\n",destip[0],destip[1],destip[2],destip[3]);
                 // Check for error
                 if(ret <= 0)
                 {
