@@ -1,2 +1,5 @@
-build/default/production/socket.tmp:  \
-build/default/production/socket.i 
+build/default/production/socket.o:  \
+socket.c  \
+socket.h  \
+wizchip_conf.h  \
+ w5500.h 

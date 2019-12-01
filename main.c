@@ -43,11 +43,13 @@
 #define SOCK_ID_UDP       1
 #define PORT_TCP          5000
 #define PORT_UDP          10001
-#define DATA_BUF_SIZE     2048
+#define DATA_BUF_SIZE     1024
 
 wiz_NetInfo pnetinfo;
-uint8_t gDATABUF[DATA_BUF_SIZE]; //shared buffer declaration
+uint8_t gDATABUF[DATA_BUF_SIZE]; 
 uint8_t tmp;
+uint8_t HTTP_ok[] = {"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"};
+uint8_t HTML_web[] = {"<html><body><p style=\"color: green; font-size: 2.0em;\">hello world</p></body></html>"};
 
 /*Call back function for W5500 SPI - Theses used as parametr of reg_wizchip_spi_cbfunc()
  Should be implemented by WIZCHIP users because host is dependent it*/
@@ -60,6 +62,7 @@ void TCP_Server(void);
 void UDP_Server(void);
 void W5500_Init(void);
 void network_init(void);
+
 
 /*definition of network parameters*/
  wiz_NetInfo gWIZNETINFO =
@@ -77,19 +80,26 @@ int main(void)
 {
     // initialize the device
     SYSTEM_Initialize();
-    printf("------------W5500_TEST_START---- --------\r\n");
+    printf("\r\n***** W5500_TEST_START *****\r\n");
     W5500_Init();
-    printf("---------W5500 successfully connect to Router ---------\r\n"); // must be connect cable W5500 to Router
-        
+    printf("\r\n***** W5500 successfully connect to Router *****\r\n"); // must be connect cable W5500 to Router
+    
+//open_socket();    
     while (1)
     {
                  
         /*TCP Server*/
-        //TCP_Server();
+        TCP_Server();
         /*UDP Server*/
         UDP_Server();
+                       
     }
 }
+
+
+
+
+
 /*Call back function for W5500 SPI*/
 
 void CB_ChipSelect(void) // Call back function for WIZCHIP select.
@@ -136,6 +146,7 @@ void TCP_Server(void)
             // Get received data size
             if((size = getSn_RX_RSR(SOCK_ID_TCP)) > 0)
             {
+                printf("\r\n***** TCP Packet Received *****\r\n");
                 // Cut data to size of data buffer
                 if(size > DATA_BUF_SIZE)
                 {
@@ -150,23 +161,22 @@ void TCP_Server(void)
                 {
                     return;
                 }
-
-                // Send echo to remote
-                sentsize = 0;
-                while(size != sentsize)
-                {
-                    ret = send(SOCK_ID_TCP, gDATABUF + sentsize, size - sentsize);
+                printf("\r\n");
+                UART1_WriteBuffer(gDATABUF, size); //show the contents of the buffer 
+                memset(gDATABUF, 0, sizeof(gDATABUF)); //clear gDATABUF
+                                
+                /*Send confirmation and web page back to the web client */
+                ret = send(SOCK_ID_TCP, HTTP_ok, sizeof(HTTP_ok));
+                ret = send(SOCK_ID_TCP, HTML_web, sizeof(HTML_web));
                     
-                    // Check if remote close socket
-                    if(ret < 0)
+                // Check if remote close socket
+                
+                if(ret < 0)
                     {
                         close(SOCK_ID_TCP);
                         return;
                     }
-
-                    // Update number of sent bytes
-                    sentsize += ret;
-                }
+                  
             }
             break;
         }
@@ -191,7 +201,7 @@ void TCP_Server(void)
             {
                 return;
             }
-
+                           
             break;
         }
 
@@ -201,9 +211,10 @@ void TCP_Server(void)
             // Open TCP socket
             if((ret = socket(SOCK_ID_TCP, Sn_MR_TCP, PORT_TCP, 0x00)) != SOCK_ID_TCP)
             {
+                printf("\r\n***** socket is not opened *****\r\n");
                 return;
             }
-
+           printf("\r\n***** socket is no. %d opened success *****\r\n", ret);
            break;
         }
 
@@ -231,7 +242,7 @@ void UDP_Server(void)
             // Get received data size
             if((size = getSn_RX_RSR(SOCK_ID_UDP)) > 0)
             {
-                printf("-------UDP Packet Received-------\r\n");
+                printf("\r\n***** UDP Packet Received *****\r\n");
                 // Cut data to size of data buffer
                 if(size > DATA_BUF_SIZE)
                 {
@@ -245,10 +256,10 @@ void UDP_Server(void)
                 {
                     return;
                 }
+                printf("\r\n");
                 UART1_WriteBuffer(gDATABUF, size); //show the contents of the buffer 
                 memset(gDATABUF, 0, sizeof(gDATABUF)); //clear gDATABUF
-                printf("\r\n");
-                
+                               
                 // Send echo to remote
                 size = (uint16_t) ret;
                 sentsize = 0;
@@ -270,14 +281,13 @@ void UDP_Server(void)
         // Socket is not opened
         case SOCK_CLOSED:
         {
-            printf("-------socket is not opened-------\r\n");
             // Open UDP socket
             if((ret=socket(SOCK_ID_UDP, Sn_MR_UDP, PORT_UDP, 0x00)) != SOCK_ID_UDP)
             {
-                printf("---------socket is not opened---------\r\n");
+                printf("r\n***** socket is not opened *****\r\n");
                 return;
             }
-            printf("------socket is no. %d opened success------\r\n", ret);
+            printf("\r\n***** socket is no. %d opened success *****\r\n", ret);
             break;
         }
 
@@ -317,10 +327,10 @@ void UDP_Server(void)
     do
     {
        if(!(ctlwizchip(CW_GET_PHYLINK, (void*)&tmp)))
-          printf("Unknown PHY Link status.\r\n");
+          printf("\r\nUnknown PHY Link status.\r\n");
        delayMs(500);
     }  while(tmp == PHY_LINK_OFF); 
-    printf("PHY Link status OK.\r\n");
+    printf("\r\nPHY Link status OK.\r\n");
     
     /*Intialize the network information to be used in WIZCHIP*/
     network_init();
@@ -336,7 +346,7 @@ void network_init(void)
   ctlwizchip(CW_GET_ID,(void*)tmpstr); //GET ID WIZNET like this : W5500
   /*Send the data to the Uart*/
   printf("\r\n=== %s NET CONF ===\r\n",(char*)tmpstr);
-  printf("MAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n", pnetinfo.mac[0],pnetinfo.mac[1],pnetinfo.mac[2],
+  printf("\r\nMAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n", pnetinfo.mac[0],pnetinfo.mac[1],pnetinfo.mac[2],
 		   pnetinfo.mac[3],pnetinfo.mac[4],pnetinfo.mac[5]);
   printf("SIP: %d.%d.%d.%d\r\n", pnetinfo.ip[0],pnetinfo.ip[1],pnetinfo.ip[2],pnetinfo.ip[3]);
   printf("GAR: %d.%d.%d.%d\r\n", pnetinfo.gw[0],pnetinfo.gw[1],pnetinfo.gw[2],pnetinfo.gw[3]);

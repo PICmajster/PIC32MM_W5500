@@ -3,7 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/home/wat/Dropbox/MPLABXProjects/pic32mm_Ethernet.X/mcc_generated_files/exceptions.c</file>
+            <file>file:/home/wat/Dropbox/MPLABXProjects/pic32mm_Ethernet.X/w5500.c</file>
             <file>file:/home/wat/Dropbox/MPLABXProjects/pic32mm_Ethernet.X/main.c</file>
+            <file>file:/home/wat/Dropbox/MPLABXProjects/pic32mm_Ethernet.X/socket.h</file>
+            <file>file:/home/wat/Dropbox/MPLABXProjects/pic32mm_Ethernet.X/w5500.h</file>
+            <file>file:/home/wat/Dropbox/MPLABXProjects/pic32mm_Ethernet.X/mcc_generated_files/spi3.c</file>
+            <file>file:/home/wat/Dropbox/MPLABXProjects/pic32mm_Ethernet.X/socket.c</file>
         </group>
     </open-files>
 </project-private>
